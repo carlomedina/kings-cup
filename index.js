@@ -5,10 +5,7 @@ var io = require('socket.io')(http);
 var redis = require('redis');
 
 
-var client = redis.createClient(process.env.REDIS_URL)
-
-
-
+var client = redis.createClient(process.env.REDIS_URL || 'redis://localhost:6379')
 
 
 // Routing
@@ -32,20 +29,25 @@ io.on('connection', function(socket){
   // create a channel for a given session
   socket.on('createChannel', function(userID) {
 
+    console.log('user ' + userID + 'joined the room')
+
+
     // create a random 6-character string
-    const channelID = 
+    const channelID = Math.random().toString(36).substr(2, 5)
+    console.log(channelID)
 
     // create a channel using the 6-character string
     // add the user to the channels' list of players
     // add the channelID to the list of all active channelID
     socket.join(channelID)
+    socket.emit(channelID, 'Your channelID is ' + channelID)
     client.lpush(channelID, userID)
-    client.sadd('eactiveChannels', channelID)
+    client.sadd('activeChannels', channelID)
 
 
     // initialize the deck of cards by randomly permuting a set and storing it
     // in a named Redis queue (also named the same way as the socket channel)
-    const shuffledDeck
+    const shuffledDeck = ['Ac', 'Ad', 'Ah', 'As']
 
     var channelOfCards = channelID + 'cards'
     client.lpush(channelOfCards, shuffledDeck)
@@ -57,15 +59,17 @@ io.on('connection', function(socket){
   // params
   // data - JSON {userID, channelID}
   socket.on('joinChannel', function(data) {
-    
+    console.log(data.userID + ' joined the channel')
+
     // join a channel
     socket.join(data.channelID)
 
     // add to list of players
-    client.sadd(channelID, userID)
+    client.lpush(data.channelID, data.userID)
 
     // broadcast to all connected players who joined the game
-    io.to(data.channelID).emit(userID + 'has joined the game')
+    socket.emit(data.channelID, data.userID + 'has joined the game')
+
 
   })
 
@@ -80,7 +84,7 @@ io.on('connection', function(socket){
   socket.on('cardPlay', function(data) {
 
     // do a redis pop to get a card
-    const channelOfCards = 
+    const channelOfCards = data.channelID + 'cards'
     client.lpop(channelOfCards, function(err, card) {
       
       // and get the next player 
@@ -91,7 +95,9 @@ io.on('connection', function(socket){
                      "card": card,
                      "nextplayer": player
                     }
-      io.to(data.channelID).emit(payload)
+
+      // broadcast what card was played and who is to play next
+      socket.emit(data.channelID, JSON.stringify(payload))
 
       // add the pushed player back to the end of the queue
       client.lpush(data.channelID, player)

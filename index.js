@@ -4,21 +4,18 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var redis = require('redis');
 
-
-var client = redis.createClient(process.env.REDIS_URL || 'redis://localhost:6379')
-
+var client = redis.createClient(process.env.REDIS_URL || 'redis://localhost:6379');
 
 // Routing
 app.use(express.static('public'));
 
-app.get('/driver', function(req, res){
-  res.sendFile(__dirname + "/public/driver.html")
+app.get('/entry', function(req, res){
+  res.sendFile(__dirname + "/public/entry.html")
 });
 
-app.get('/rider', function(req, res){
-  res.sendFile(__dirname + "/public/rider.html")
+app.get('/create', function(req, res){
+  res.sendFile(__dirname + "/public/create.html")
 });
-
 
 io.on('connection', function(socket){
 
@@ -31,9 +28,10 @@ io.on('connection', function(socket){
 
     console.log('user ' + userID + 'joined the room')
 
-
     // create a random 6-character string
     const channelID = Math.random().toString(36).substr(2, 5)
+    socket.emit('passChannelID', { id : channelID});
+
     console.log(channelID)
 
     // create a channel using the 6-character string
@@ -51,8 +49,6 @@ io.on('connection', function(socket){
 
     var channelOfCards = channelID + 'cards'
     client.lpush(channelOfCards, shuffledDeck)
-
-
   })
 
   // end-point for other players to join a channel
@@ -69,12 +65,7 @@ io.on('connection', function(socket){
 
     // broadcast to all connected players who joined the game
     socket.emit(data.channelID, data.userID + 'has joined the game')
-
-
   })
-
-
-
 
   // when any player does a card uncover, do a Redis pop to select a card to play
   // publish the selected card to everyone on the channel

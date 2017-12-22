@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Create Room</title>
+  </head>
+
+  <script src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    // Parse URL for the user string
+    var url_string = window.location.href;
+    var url = new URL(url_string);
+    var userID = url.searchParams.get("username");
+
+    // Create channel server side
+    var socket = io();
+    socket.emit('createChannel', { id : userID });
+
+    // Get the random 6 digits back from server and display
+    socket.on('passChannelID', function(data) {
+      document.getElementById("roomCode").innerHTML = data.id;
+    })
+  </script>
+
+  <body>
+    <h1>
+      Your room code is:
+      <h1 id="roomCode"></h1>
+    </h1>
+
+<!-- var url_string = "http://www.example.com/t.html?a=1&b=3&c=m2-m3-m4-m5"; //window.location.href
+var url = new URL(url_string);
+var c = url.searchParams.get("c");
+console.log(c);
+ -->
+  </body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Entry</title>
+  </head>
+
+  <script src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
+  <script>
+    // On create, a channel should be created on server side using the userName provided
+    // A redirect should be performed to enter the player waiting screen
+    $(document).on('click', '.cbtn', function() {
+        var userName = document.getElementById("userName").value;
+        if (userName && userName.length > 0) {
+          window.location = '/create?username=' + userName;
+        }
+    })
+    $(document).on('click', '.jbtn', function() {
+        var userName = document.getElementById("userName").value;
+        if (userName && userName.length > 0) {
+          window.location = '/join?username=' + userName;
+        }
+    })
+  </script>
+
+  <body>
+    <h1>
+      Please login here!
+    </h1>
+    <form id="createOrJoin" action="redirectCreateJoin">
+      <label for="userName">Enter your username: </label>
+      <input id="userName" type="text" maxlength="55" class="box" autofocus />
+      <br>
+      <input type="button" id="create" value="Create Room" class="cbtn" />
+      <input type="button" id="join" value="Join Room" class="jbtn" />
+    </form>
+  </body>
+</html>
+
+<!-- 
+  <script src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+
+  <script>
+  var socket = io();
+  var random = Math.random()
+  // connect to a driver channel to publish position
+  // socket.emit('connect2driver', {vehicleID: 'theride1'})
+  socket.on('channel1', function(data) {
+    console.log(data)
+    $('.location').append(data)
+  })
+  </script> -->

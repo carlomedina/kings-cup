@@ -29,6 +29,10 @@
 
     // Update the number of players when the channel join socket is hit
     // TODO
+    socket.on("joinChannel" + channelID, function() {
+      console.log('someone joined!')
+      document.getElementById("numPlayers").innerHTML = ++num;
+    })
 
   </script>
 

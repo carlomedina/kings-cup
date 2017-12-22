@@ -47,7 +47,7 @@ io.on('connection', function(socket){
     client.sadd('activeChannels', channelID)
 
     // Add the user to the channel's list of players
-    client.lpush(channelID, userID)
+    client.lpush(channelID + 'players', userID)
 
     console.log("Channel '" + channelID + "' was created by user '" + userID + "'")
 
@@ -60,8 +60,8 @@ io.on('connection', function(socket){
     // client.lpush(channelOfCards, shuffledDeck)
   })
 
+  // Check if a channel is available to be joined
   socket.on('checkChannel', function(channelID) {
-    console.log('channel iddd is ' + channelID);
 
     // Grab all channels and check
     client.smembers('activeChannels', function(err, reply) {
@@ -76,13 +76,13 @@ io.on('connection', function(socket){
   // params
   // data - JSON {userID, channelID}
   socket.on('joinChannel', function(data) {
-    console.log(data.userID + ' joined the channel')
+    console.log(data.userID + ' joined channel ' + data.channelID)
 
-    // join a channel
+    // Join a channel
     socket.join(data.channelID)
 
-    // add to list of players
-    client.lpush(data.channelID, data.userID)
+    // Add to list of players
+    client.lpush(data.channelID + "players", data.userID)
 
     // broadcast to all connected players who joined the game
     socket.emit(data.channelID, data.userID + 'has joined the game')

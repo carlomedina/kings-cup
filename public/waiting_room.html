@@ -10,11 +10,12 @@
     // Parse URL for the user string
     var url_string = window.location.href;
     var url = new URL(url_string);
-    var userID = url.searchParams.get("username");
+    var username = url.searchParams.get("username");
+    var code = url.searchParams.get("room");
 
     // Create channel server side
     var socket = io();
-    socket.emit('joinChannel', { channelID :  , userID : });
+    socket.emit('joinChannel', { channelID : code , userID : username});
 
     // Get the random 6 characters back from server and display
     var channelID;

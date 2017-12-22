@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Joined Room</title>
+  </head>
+  <script src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    $(document).on('click', '.btn', function() {
+      var code = document.getElementById("roomCode").value;
+
+      var socket = io();
+      socket.emit('checkChannel', code);
+      socket.on('validChannel', function(valid) {
+        if (code && valid) { window.location = '/waiting_room'; }
+      })
+    })
+  </script>
+
+  <body>
+    <form id="join">
+      <label for="roomCode">Enter the five digit room code</label>
+      <input id="roomCode" type="text" maxlength="5" class="box" autofocus />
+      <input type="button" id="join" value="Join Room" class="btn" />
+    </form>
+  </body>
+</html>

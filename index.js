@@ -17,40 +17,59 @@ app.get('/create', function(req, res){
   res.sendFile(__dirname + "/public/create.html")
 });
 
+app.get('/join', function(req, res){
+  res.sendFile(__dirname + "/public/join.html")
+});
+
+app.get('/waiting_room', function(req, res){
+  res.sendFile(__dirname + "/public/waiting_room.html")
+});
+
 io.on('connection', function(socket){
 
   socket.on('connect', function() {
     console.log('A client connected')
   })
   
-  // create a channel for a given session
+  // Create a channel for a given session
   socket.on('createChannel', function(userID) {
 
-    console.log('user ' + userID + 'joined the room')
-
-    // create a random 6-character string
+    // Create a random 6-character string
     const channelID = Math.random().toString(36).substr(2, 5)
-    socket.emit('passChannelID', { id : channelID});
 
-    console.log(channelID)
+    // Pass the string to client
+    socket.emit('passChannelID', { id : channelID });
 
-    // create a channel using the 6-character string
-    // add the user to the channels' list of players
-    // add the channelID to the list of all active channelID
+    // Create a channel using the 6-character string
     socket.join(channelID)
-    
-    //socket.emit(channelID, 'Your channelID is ' + channelID)
-    
-    client.lpush(channelID, userID)
+
+    // Add the channelID to the list of all active channelID
     client.sadd('activeChannels', channelID)
 
+    // Add the user to the channel's list of players
+    client.lpush(channelID, userID)
 
+    console.log("Channel '" + channelID + "' was created by user '" + userID + "'")
+
+    // TODO: in more detail
     // initialize the deck of cards by randomly permuting a set and storing it
     // in a named Redis queue (also named the same way as the socket channel)
-    const shuffledDeck = ['Ac', 'Ad', 'Ah', 'As']
+    // const shuffledDeck = ['Ac', 'Ad', 'Ah', 'As']
 
-    var channelOfCards = channelID + 'cards'
-    client.lpush(channelOfCards, shuffledDeck)
+    // var channelOfCards = channelID + 'cards'
+    // client.lpush(channelOfCards, shuffledDeck)
+  })
+
+  socket.on('checkChannel', function(channelID) {
+    console.log('channel iddd is ' + channelID);
+
+    // Grab all channels and check
+    client.smembers('activeChannels', function(err, reply) {
+      var check = (reply.indexOf(channelID) != -1);
+
+      // Send results
+      socket.emit('validChannel', check);
+    });
   })
 
   // end-point for other players to join a channel

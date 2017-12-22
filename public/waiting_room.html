@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Create Room</title>
+    <title>Join Room</title>
   </head>
 
   <script src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
@@ -14,30 +14,32 @@
 
     // Create channel server side
     var socket = io();
-    socket.emit('createChannel', userID);
+    socket.emit('joinChannel', { channelID :  , userID : });
 
     // Get the random 6 characters back from server and display
     var channelID;
-    var num = 1;
-
-    console.log(document.getElementById("roomCode"));
     socket.on('passChannelID', function(data) {
       channelID = data.id;
       document.getElementById("roomCode").innerHTML = channelID;
-      document.getElementById("numPlayers").innerHTML = num;
     })
 
-    // Update the number of players when the channel join socket is hit
-    // TODO
+    var numPlayers = 1;
 
+
+    // Update number of players in room on a
+    // socket.on(channelID, function(data)) {
+      
+    // }
   </script>
 
   <body>
-    <div class="content-display">
-      Your room code is:
-      <h1 id="roomCode"></h1>
+    <h1>
+      Joined <h1 id="roomHostId"></h1>'s room!
 
-      There are currently <h1 id="numPlayers"></h1> players in the room right now! 
-    </div>
+      There are currently <h1 id="numPeople"> X </h1> players in the room right now! 
+
+      Waiting for 5 to start the game.
+    </h1>
+
   </body>
 </html>

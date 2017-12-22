@@ -16,16 +16,27 @@
     var socket = io();
     socket.emit('createChannel', { id : userID });
 
-    // Get the random 6 digits back from server and display
+    // Get the random 6 characters back from server and display
+    var channelID;
     socket.on('passChannelID', function(data) {
-      document.getElementById("roomCode").innerHTML = data.id;
+      channelID = data.id;
+      document.getElementById("roomCode").innerHTML = channelID;
     })
+
+    var numPlayers = 1;
+
+    // Update number of players in room on a
+    socket.on(channelID, function(data)) {
+      
+    }
   </script>
 
   <body>
     <h1>
       Your room code is:
       <h1 id="roomCode"></h1>
+
+      There are currently <h1 id="numPeople">  </h1> players in the room right now! 
     </h1>
 
 <!-- var url_string = "http://www.example.com/t.html?a=1&b=3&c=m2-m3-m4-m5"; //window.location.href

@@ -38,7 +38,9 @@ io.on('connection', function(socket){
     // add the user to the channels' list of players
     // add the channelID to the list of all active channelID
     socket.join(channelID)
-    socket.emit(channelID, 'Your channelID is ' + channelID)
+    
+    //socket.emit(channelID, 'Your channelID is ' + channelID)
+    
     client.lpush(channelID, userID)
     client.sadd('activeChannels', channelID)
 

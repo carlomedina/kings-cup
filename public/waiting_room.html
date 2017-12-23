@@ -15,16 +15,29 @@
 
     // Create channel server side
     var socket = io();
+
+    // send a join message to the overall channel
     socket.emit('joinChannel', { channelID : code , userID : username});
 
-    // Get the random 6 characters back from server and display
-    var channelID;
-    socket.on('passChannelID', function(data) {
-      channelID = data.id;
-      document.getElementById("roomCode").innerHTML = channelID;
+
+    // Join a channel
+    socket.join(code)
+
+    // this is the workhorse of the gameplay
+    // params: data {method, payload}
+    socket.on(code, function(data) {
+      // when the room owner initiates 'start'
+      // do a get request to get the card.html page
+    if (data.method == 'start') {
+    
+      window.location = /game/+code+'?username='+userID
+    
+    } else if (data.method == 'new_player') {
+      // update the new player div element
+    }
+
     })
 
-    var numPlayers = 1;
 
 
     // Update number of players in room on a

@@ -19,18 +19,47 @@
           window.location = '/join?username=' + userName;
         }
     })
+
+  function create() {
+    var userName = document.getElementById("userName").value;
+   
+    if (userName && userName.length > 0) {
+    window.location = '/create?username=' + userName
+
+      // VERSION 2: using async
+    //   const payload = "username="+userName
+    //   const xhr = new XMLHttpRequest();
+
+    //   xhr.onreadystatechange = function() {
+    //     if (this.readyState == 4 && this.status == 200) {
+    //       window.location = 
+    //     }
+    //   }
+
+    //   xhr.open("GET", "/create")
+    //   xhr.send("username="+username);
+    // }
+  }
+
+  function join() {
+    // var form = '<form action="/join">Channel id: <br> <input type="text" name="channelID"> </input> </form>';
+    document.getElementById("join").innerHTML += '<form class="join-form" action="/join">Channel id: <br> <input type="text" name="channelID"> </input> </form>';
+    // document.getElementById("id").appendChild(element);
+
+  }
   </script>
 
   <body>
     <h1>
-      Please login here!
+      King's Cup
     </h1>
     <form id="createOrJoin">
       <label for="userName">Enter your username: </label>
       <input id="userName" type="text" maxlength="55" class="box" autofocus />
       <br>
-      <input type="button" id="create" value="Create Room" class="cbtn" />
-      <input type="button" id="join" value="Join Room" class="jbtn" />
+      <input type="button" id="create" value="Create Room" class="cbtn" onclick="create();"/> 
+      <br>
+      <input type="button" id="join" value="Join Room" class="jbtn" onclick="join();"/>
     </form>
   </body>
 </html>

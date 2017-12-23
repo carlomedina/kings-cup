@@ -34,6 +34,13 @@
       document.getElementById("numPlayers").innerHTML = ++num;
     })
 
+  function start() {
+    // send message to the channel that the game is starting
+    socket.emit(channelID, '{"method": "start", "payload": ""}')
+
+    // go to the main game page
+    window.location = /game/+channelID+'?username='+userID
+  }
   </script>
 
   <body>
@@ -42,6 +49,11 @@
       <h1 id="roomCode"></h1>
 
       There are currently <h1 id="numPlayers"></h1> players in the room right now! 
+
+      <div class="start-game">
+        <input type="button" id="start" value="Start Game" class="cbtn" onclick="start();"/> 
+      <br>
+      </div>
     </div>
   </body>
 </html>

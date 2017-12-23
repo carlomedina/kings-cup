@@ -3,8 +3,12 @@ var app = express();
 var http = require("http").Server(app);
 var io = require("socket.io")(http);
 var redis = require("redis");
+var bodyParser = require("body-parser");
 
 var client = redis.createClient(process.env.REDIS_URL || "redis://localhost:6379");
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 // Routing
 app.use(express.static("public"));
@@ -25,6 +29,21 @@ app.get("/waiting_room", function(req, res){
   res.sendFile(__dirname + "/public/waiting_room.html")
 });
 
+app.post("/check_code", function(req, res){
+  var code = req.body.code
+  client.smembers("activeChannels", function(err, reply) {
+    res.send(reply.indexOf(code) != -1)
+  }
+})
+
+// POST REQUQEST TO GET CARD IMAGE
+app.post("/card_image", function(req, res) {
+  console.log(req)
+  var cardname = req.body.card + ".png"
+  res.sendFile(__dirname + "/public/cards/PNG/" + cardname)
+})
+
+
 io.on("connection", function(socket){
 
   socket.on("connect", function() {
@@ -42,10 +61,8 @@ io.on("connection", function(socket){
 
     // Create a channel using the 6-character string
     socket.join(channelID)
-
     // Add the channelID to the list of all active channelID
     client.sadd("activeChannels", channelID)
-
     // Add the user to the channel"s list of players
     client.lpush(channelID + "players", userID)
 
@@ -77,18 +94,15 @@ io.on("connection", function(socket){
   socket.on("joinChannel", function(data) {
     console.log(data.userID + " joined channel " + data.channelID)
 
-    // Join a channel
-    socket.join(data.channelID)
-
     // Add to list of players
     client.lpush(data.channelID + "players", data.userID)
 
     // Tell the host that you joined so it increments
     // TODO: Use redis incr and decr for player number instead of length
-    socket.emit("joinChannel" + data.channelID)
+    // socket.emit("joinChannel" + data.channelID)
 
     // Broadcast to all connected players who joined the game
-    socket.emit(data.channelID + "players", data.userID + "has joined the game")
+    socket.emit(data.channelID, '{"method": "new_player", "payload": "'+data.userID+'"}')
   })
 
   // when any player does a card uncover, do a Redis pop to select a card to play

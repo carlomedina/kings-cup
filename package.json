@@ -1,0 +1,33 @@
+{
+  "name": "kings",
+  "version": "1.0.0",
+  "description": "mweb app for kings",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  
+  "dependencies" : {
+    "express" : "~4.0.0",    
+    "request": "latest",
+    "http": "latest",
+    "socket.io-client": "latest",
+    "socket.io" : "latest",
+    "redis": "redis"    
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/carlomedina/kings-cup.git"
+  },
+  "keywords": [
+    "node",
+    "kings",
+    "express"
+  ],
+  "author": "cmedina",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/carlomedina/kings-cup/issues"
+  },
+  "homepage": "https://github.com/carlomedina/kings-cup#readme"
+}

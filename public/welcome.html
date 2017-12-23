@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Virtual Kings</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<script>
+	function create() {
+		// go to /create endpoint
+	}
+
+	function join() {
+		// var form = '<form action="/join">Channel id: <br> <input type="text" name="channelID"> </input> </form>';
+		document.getElementById("join-game").innerHTML += '<form class="join-form" action="/join">Channel id: <br> <input type="text" name="channelID"> </input> </form>';
+		// document.getElementById("id").appendChild(element);
+
+	}
+	</script>
+
+	<style>
+	#game-name {
+		font-family: sans-serif;
+	}
+
+	.init-buttons {
+		width: 80%;
+		height: 100px;
+		position: relative;
+		left: 50%;
+		transform: translateX(-50%);
+	}
+
+	.join-form {
+		width: 80%;
+		height: 100px;
+		position: relative;
+		left: 50%;
+		transform: translateX(-50%);
+	}
+
+	.wrapper {
+		max-width: 500px;
+		width: 80%;
+		height: 100%;
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translateX(-50%) translateY(-50%);
+		background-color: green;
+	}
+	</style>
+</head>
+
+<body>
+<div class="wrapper">
+	<div class="header">
+		<div id="game-name">
+		<h1>King's Cup</h1>
+		</div>
+	</div>
+
+	<div class="game-mode">
+		<div id="create-game">
+		<button class="init-buttons" onclick="create();"> Create Game </button>
+		</div>
+		<div id="join-game">
+		<button class="init-buttons" onclick="join();"> Join Game </button>
+		</div>
+	</div>
+</div>
+
+</body>
+</html>

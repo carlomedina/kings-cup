@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Virtual Kings</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<!-- 	<style>
+	.wrapper {
+		transform: translateX(-50%);
+		left: 50%;
+		top: 50%;
+	}
+	</style>
+ -->
+
+
+<script>
+var socket = io();
+
+// connect to the game channel
+// game channel XXXXXXX needs to be replaced with the actual channelID before the server sends the page to client
+socket.on('XXXXXXX', function(data) {
+
+	// get method to do with the message
+	var method = data.method
+  // messages could either be...
+
+  // update room status (number of players, xyz disconnected)
+
+  // card has been played 
+
+  // enable the player to play a card
+})
+
+// send signal that the player just played a card
+function sendCardPlay() {
+	socket.emit()
+}
+
+</script>
+
+</head>
+
+<body>
+<div class="wrapper">
+	<div class="header">
+		<div class="room-info">
+			<div class="info">Room name: <span id="room-name">XXXX</span> </div>
+			<div class="info"><span id="player-count">XXXX</span> people in the room</div>
+			<div class="info"><span id="current-player">XXXX</span> to play </div>
+		</div>
+	</div>
+
+	<div class="play-area">
+		<div class="main-area">
+		</div>
+	</div>
+
+</body>
+</html>

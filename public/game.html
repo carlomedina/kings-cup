@@ -8,6 +8,9 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
 var channelID = window.location.pathname.replace(/\/game\//, '');
+var url_string = window.location.href;
+var url = new URL(url_string);
+var username = url.searchParams.get("username");
 var socket = io();
 
 // connect to the game channel
@@ -17,15 +20,30 @@ socket.emit('mailman', '{"method" : "game_play", "payload" : {"channelID" : "'+c
 socket.on('messages', function(data) {
 	var data = JSON.parse(data)
 	console.log(data)
-	// get method to do with the message
+
 	var method = data.method
-  // messages could either be...
+
+	// initial signal
   if (method == 'game_play') {
   	document.getElementById('player-count').innerHTML = data.payload.number_players
   	document.getElementById('current-player').innerHTML = data.payload.next_player
-  } else if (method == 'card_play') {
+  	// disable get card if not turn yet
+  	if (data.payload.next_player != username) {
+  		document.getElementById('card-button').disabled = true
+  	} else {
+  		document.getElementById('card-button').disabled = false
+  	}
+  } 
+  	// during gameplay
+  else if (method == 'card_play') {
   	document.getElementById('current-player').innerHTML = data.payload.next_player
   	document.getElementById('card').innerHTML = data.payload.card
+  	// disable get card if not turn yet
+  	if (data.payload.next_player != username) {
+  		document.getElementById('card-button').disabled = true
+  	} else {
+  		document.getElementById('card-button').disabled = false
+  	}
   }
   // update room status (number of players, xyz disconnected)
 
@@ -59,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	</div>
 
 	<div class="play-area">
-		<button onclick='sendCardPlay();'> Play a card </button>
+		<button id="card-button" onclick='sendCardPlay();'> Play a card </button>
 		<div class="main-area">
 			<div id="card">
 			</div>

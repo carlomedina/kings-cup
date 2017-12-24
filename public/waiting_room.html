@@ -27,7 +27,7 @@
         console.log('STARTING THE GAME!!!')
         window.location = /game/+channelID+'?username='+username
       } else if (data.method == 'new_player') {
-        document.getElementById('newplayers').innerHTML += data.payload.username + '<br>'
+        document.getElementById('newplayers').innerHTML = data.payload.username + '<br>'
       }
     })
 

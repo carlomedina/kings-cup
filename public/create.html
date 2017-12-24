@@ -11,20 +11,17 @@
     var url_string = window.location.href;
     var url = new URL(url_string);
     var username = url.searchParams.get("username");
+    var channelID = url.searchParams.get("channelID")
     var socket = io();
   
-
-    var channelID;
-    socket.emit('mailman', '{"method" : "create_channel", "payload" : {"username" : "'+username+'"}}')
+    // join the created channel
+    socket.emit('mailman', '{"method" : "join_channel", "payload" : {"username" : "' + username + '", "channelID" : "'+channelID+'"}}')
 
     socket.on('messages', function(data) {
+      console.log(data)
       var data = JSON.parse(data)
-      if (data.method == 'initialize_channel') {
-        channelID = data.payload.channelID
-        document.getElementById('roomCode').innerHTML = channelID
-      } else if (data.method == 'new_player') {
-        document.getElementById('namePlayers').innerHTML += data.payload.username + '<br>'
-        console.log('NEW PLAYER ' + data.payload + ' JOINED')
+      if (data.method == 'new_player') {
+        document.getElementById('namePlayers').innerHTML = data.payload.username + '<br>'
       }
     })
 
@@ -36,6 +33,12 @@
     window.location = /game/+channelID+'?username='+username
   }
 
+
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('roomCode').innerHTML = channelID
+    }); 
+      
+
   </script>
 
   <body>
@@ -46,9 +49,9 @@
       There are currently <h1 id="numPlayers"></h1> players in the room right now! 
 
       <div class="start-game">
-        <button id="start" value="Start Game" class="cbtn" onclick="start();"/> 
+        <button id="start" value="Start Game" class="cbtn" onclick="start();">Start Game</button>
         <br>
-        
+
         <div id="namePlayers">
         </div>
       

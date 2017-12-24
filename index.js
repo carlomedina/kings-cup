@@ -1,11 +1,10 @@
-var express = require("express")
-var app = express();
-var http = require("http").Server(app);
-var io = require("socket.io")(http);
-var redis = require("redis");
-var bodyParser = require("body-parser");
-
-var client = redis.createClient(process.env.REDIS_URL || "redis://localhost:6379");
+const express = require("express")
+const app = express();
+const http = require("http").Server(app);
+const io = require("socket.io")(http);
+const redis = require("redis");
+const bodyParser = require("body-parser");
+const client = redis.createClient(process.env.REDIS_URL || "redis://localhost:6379");
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -34,7 +33,7 @@ app.get("/game/:channelID", function(req, res) {
 });
 
 app.post("/check_code", function(req, res){
-  var code = req.body.code
+  const code = req.body.code
   client.smembers("activeChannels", function(err, reply) {
     res.send(reply.indexOf(code) != -1)
   })
@@ -51,15 +50,14 @@ app.post("/card_image", function(req, res) {
 io.on("connection", function(socket){
 
   socket.on("connect", function() {
-    console.log("A client connected")
-  })
+    console.log("A client connected");
+  });
   
-// main workhorse
+  // main workhorse
   socket.on("mailman", function(data) {
     var data = JSON.parse(data)
-    var method = data.method
-    console.log(data)
-    console.log(method)
+    const method = data.method
+
     if (method == 'create_channel') {
       // Create a random 6-character string
       const channelID = Math.random().toString(36).substr(2, 5)
@@ -73,22 +71,27 @@ io.on("connection", function(socket){
       // Add the channelID to the list of all active channelID
       client.sadd("activeChannels", channelID)
       // Add the user to the channel"s list of players
-      client.lpush(channelID + "players", data.payload.username)
+      // client.lpush(channelID + "players", data.payload.username)
 
-      console.log("Channel '" + channelID + "' was created by user '" + data.payload.username + "'")
+      console.log("[INFO]: Channel '" + channelID + "' was created by user '" + data.payload.username + "'")
 
     } else if (method == 'join_channel') {
       const queueOfPlayers = data.payload.channelID + "players"
       socket.join(data.payload.channelID)
       client.lpush(queueOfPlayers, data.payload.username)
-      console.log('PLAYER IS JOINING THE GAME. SENDING THE MESSAGE TO THE ROOM ' + data.payload.channelID)
-      io.to(data.payload.channelID).emit('messages', '{"method" : "new_player", "payload" : {"username" : "' + data.payload.username + '"}}');
+
+      // get all connected players
+      client.lrange(queueOfPlayers, 0, -1, function (err, listOfPlayers) {
+        console.log(listOfPlayers)
+        io.to(data.payload.channelID).emit('messages', '{"method" : "new_player", "payload" : {"username" : ' + JSON.stringify(listOfPlayers) + '}}');
+        console.log('[INFO]: '+ data.payload.username + ' joined the channel ' + data.payload.channelID)
+      })
+      
 
     } else if (method == 'start') {
-      var channel = data.payload.channelID
-      console.log('CHANNEL: ' + channel)
-      console.log('sending signal to start the game')
+      const channel = data.payload.channelID
       io.to(data.payload.channelID).emit('messages', '{"method" : "start", "payload" : {}}');
+      console.log('[INFO]: The game in room '+ data.payload.channelID + 'is starting')
 
     } else if (method == 'card_play') {
       const queueOfCards = data.payload.channelID + "cards"

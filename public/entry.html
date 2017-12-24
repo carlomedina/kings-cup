@@ -3,50 +3,35 @@
   <head>
     <title>Entry</title>
       <script src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
-
+      <script src="/socket.io/socket.io.js"></script>
       <script>
-    // // Please excuse this very wet code
-    // $(document).on('click', '.cbtn', function() {
-    //     var userName = document.getElementById("userName").value;
-    //     if (userName && userName.length > 0) {
-    //       window.location = '/create?username=' + userName;
-    //     }
-    // })
-    // $(document).on('click', '.jbtn', function() {
-    //     var userName = document.getElementById("userName").value;
-    //     if (userName && userName.length > 0) {
-    //       window.location = '/join?username=' + userName;
-    //     }
-    // })
-
   function create() {
-    var userName = document.getElementById("userName").value;
-   console.log(userName)
-    if (userName && userName.length > 0) {
-      window.location = '/create?username=' + userName
 
-        // VERSION 2: using async
-      //   const payload = "username="+userName
-      //   const xhr = new XMLHttpRequest();
+    const username = document.getElementById("username").value;
+    var socket = io();
+    var channelID;
 
-      //   xhr.onreadystatechange = function() {
-      //     if (this.readyState == 4 && this.status == 200) {
-      //       window.location = 
-      //     }
-      //   }
+    if (username && username.length > 0) {
+      socket.emit('mailman', '{"method" : "create_channel", "payload" : {"username" : "'+username+'"}}')
 
-      //   xhr.open("GET", "/create")
-      //   xhr.send("username="+username);
-      // }
+      socket.on('messages', function(data) {
+        var data = JSON.parse(data)
+        if (data.method == 'initialize_channel') {
+          channelID = data.payload.channelID
+            if (username && username.length > 0) {
+              // console.log(channelID)
+              window.location = '/create?username=' + username + '&channelID=' + channelID
+            }
+        } 
+      })
     }
+    
   }
 
   function join() {
-    // var form = '<form action="/join">Channel id: <br> <input type="text" name="channelID"> </input> </form>';
-    // document.getElementById("join").innerHTML += '<form class="join-form" action="/join">Channel id: <br> <input type="text" name="channelID"> </input> </form>';
-    var userName = document.getElementById("userName").value;
-        if (userName && userName.length > 0) {
-          window.location = '/join?username=' + userName;
+    var username = document.getElementById("username").value;
+        if (username && username.length > 0) {
+          window.location = '/join?username=' + username;
         }
     // document.getElementById("id").appendChild(element);
   }
@@ -61,8 +46,8 @@
       King's Cup
     </h1>
     <!-- <form id="createOrJoin"> -->
-      <label for="userName">Enter your username: </label>
-      <input id="userName" type="text" maxlength="55" class="box" autofocus />
+      <label for="username">Enter your username: </label>
+      <input id="username" type="text" maxlength="55" class="box" autofocus />
       <br>
       <button id="create" class="cbtn" onclick="create();">Create Room</button>
       <br>

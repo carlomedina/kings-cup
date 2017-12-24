@@ -86,9 +86,11 @@ io.on("connection", function(socket) {
                           "Jc", "Jd", "Jh", "Js",
                           "Qc", "Qd", "Qh", "Qs", 
                           "Kc", "Kd", "Kh", "Ks"]
+
       shuffleArray(deck)
-      const channelOfCards = channelID + "cards"
-      client.lpush(channelOfCards, deck)
+      // const channelOfCards = channelID + "cards"
+      client.lpush(channelID + "cards", deck)
+      client.set(channelID + "kings", 4)
 
       console.log("[INFO]: Channel '" + channelID + "' was created by user '" + data.payload.username + "'")
 
@@ -133,19 +135,28 @@ io.on("connection", function(socket) {
     } else if (method == 'card_play') {
       const queueOfCards = data.payload.channelID + "cards"
       const queueOfPlayers = data.payload.channelID + "players"
-      const numKings = data.payload.channelID + "kings"
+      const kingsChannel = data.payload.channelID + "kings"
       client.lpop(queueOfCards, function (err, card) {
         client.lpop(queueOfPlayers, function (err, player) {
-          const message = {
-                            "method" : "card_play",
-                            "payload" : 
-                                      {
-                                        "card" : card,
-                                        "next_player" : player
-                                      }
-                          }
-          io.to(data.payload.channelID).emit('messages', JSON.stringify(message))
-          client.rpush(queueOfPlayers, player)
+          client.get(kingsChannel, function (err, num) {
+            // Game ends when all kings have been drawn
+            var end = (card[0] == 'K' && num == 1)
+            if (card[0] == 'K') {
+              client.decr(kingsChannel)
+            }
+
+            var method = end ? "game_end" : "card_play"
+            const message = {
+              "method" : method,
+              "payload" : 
+                        {
+                          "card" : card,
+                          "next_player" : player
+                        }
+            }
+            io.to(data.payload.channelID).emit('messages', JSON.stringify(message))
+            client.rpush(queueOfPlayers, player)
+          })
         })
       })
     }
@@ -169,6 +180,16 @@ function shuffleArray(array) {
         let j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
     }
+}
+
+function noKings(channel) {
+  const kingsChannel = channel + "kings"
+  var n = false
+  client.decr(kingsChannel, function(err, num) {
+    console.log(num)
+    n = (num > 0)
+  })
+  return n
 }
 
 

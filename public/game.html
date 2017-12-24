@@ -23,20 +23,21 @@ socket.on('messages', function(data) {
 	// initial signal
   if (method == 'game_play') {
   	document.getElementById('player-count').innerHTML = data.payload.number_players
-  	document.getElementById('current-player').innerHTML = data.payload.next_player
+  	document.getElementById('current-player').innerHTML = data.payload.next_player + " to play" 
     document.getElementById('card-button').disabled = (data.payload.next_player != username)
   } 
   	// during gameplay
   else if (method == 'card_play') {
-    var card_pict = document.createElement("img")
-    path = "/cards/PNG/" + data.payload.card + ".png"
-    card_pict.setAttribute("src", path)
-    card_pict.setAttribute("height","500")
-    card_pict.setAttribute("width", "300")
-  	document.getElementById('current-player').innerHTML = data.payload.next_player
-    document.getElementById('card').innerHTML = ""
-    document.getElementById('card').appendChild(card_pict)
+    showImage(data.payload.card)
+  	document.getElementById('current-player').innerHTML = data.payload.next_player + " to play"
     document.getElementById('card-button').disabled = (data.payload.next_player != username)
+  }
+
+  else if (method == 'game_end') {
+    showImage(data.payload.card)
+    // replace with a more suitable ending
+    document.getElementById('current-player').innerHTML = data.payload.next_player + " has to drink the cup!"
+    document.getElementById('card-button').disabled = true
   }
 
 })
@@ -44,6 +45,17 @@ socket.on('messages', function(data) {
 // send signal that the player just played a card
 function sendCardPlay() {
 	socket.emit('mailman', '{"method" : "card_play", "payload" : {"channelID" : "' + channelID + '"}}')
+}
+
+// show picture of card drawn
+function showImage(card) {
+  var card_pict = document.createElement("img")
+  path = "/cards/PNG/" + card + ".png"
+  card_pict.setAttribute("src", path)
+  card_pict.setAttribute("height","500")
+  card_pict.setAttribute("width", "300")
+  document.getElementById('card').innerHTML = ""
+  document.getElementById('card').appendChild(card_pict)
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -60,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		<div class="room-info">
 			<div class="info">Room name: <span id="roomCode"></span> </div>
 			<div class="info"><span id="player-count"></span> people in the room</div>
-			<div class="info"><span id="current-player"></span> to play </div>
+			<div class="info"><span id="current-player"></span></div>
 		</div>
 	</div>
 

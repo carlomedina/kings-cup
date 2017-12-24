@@ -5,29 +5,46 @@
 	<title>Virtual Kings</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-
-<!-- 	<style>
-	.wrapper {
-		transform: translateX(-50%);
-		left: 50%;
-		top: 50%;
-	}
-	</style>
- -->
-
 <script src="/socket.io/socket.io.js"></script>
 <script>
- 
+var channelID = window.location.pathname.replace(/\/game\//, '');
+var url_string = window.location.href;
+var url = new URL(url_string);
+var username = url.searchParams.get("username");
 var socket = io();
 
 // connect to the game channel
 // game channel XXXXXXX needs to be replaced with the actual channelID before the server sends the page to client
-socket.on('XXXXXXX', function(data) {
+socket.emit('mailman', '{"method" : "game_play", "payload" : {"channelID" : "'+channelID+'"}}')
 
-	// get method to do with the message
+socket.on('messages', function(data) {
+	var data = JSON.parse(data)
+	console.log(data)
+
 	var method = data.method
-  // messages could either be...
 
+	// initial signal
+  if (method == 'game_play') {
+  	document.getElementById('player-count').innerHTML = data.payload.number_players
+  	document.getElementById('current-player').innerHTML = data.payload.next_player
+  	// disable get card if not turn yet
+  	if (data.payload.next_player != username) {
+  		document.getElementById('card-button').disabled = true
+  	} else {
+  		document.getElementById('card-button').disabled = false
+  	}
+  } 
+  	// during gameplay
+  else if (method == 'card_play') {
+  	document.getElementById('current-player').innerHTML = data.payload.next_player
+  	document.getElementById('card').innerHTML = data.payload.card
+  	// disable get card if not turn yet
+  	if (data.payload.next_player != username) {
+  		document.getElementById('card-button').disabled = true
+  	} else {
+  		document.getElementById('card-button').disabled = false
+  	}
+  }
   // update room status (number of players, xyz disconnected)
 
   // card has been played 
@@ -37,8 +54,13 @@ socket.on('XXXXXXX', function(data) {
 
 // send signal that the player just played a card
 function sendCardPlay() {
-	socket.emit()
+	console.log('card at play')
+	socket.emit('mailman', '{"method" : "card_play", "payload" : {"channelID" : "' + channelID + '"}}')
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('roomCode').innerHTML = channelID
+}); 
 
 </script>
 
@@ -48,14 +70,17 @@ function sendCardPlay() {
 <div class="wrapper">
 	<div class="header">
 		<div class="room-info">
-			<div class="info">Room name: <span id="room-name">XXXX</span> </div>
-			<div class="info"><span id="player-count">XXXX</span> people in the room</div>
-			<div class="info"><span id="current-player">XXXX</span> to play </div>
+			<div class="info">Room name: <span id="roomCode"></span> </div>
+			<div class="info"><span id="player-count"></span> people in the room</div>
+			<div class="info"><span id="current-player"></span> to play </div>
 		</div>
 	</div>
 
 	<div class="play-area">
+		<button id="card-button" onclick='sendCardPlay();'> Play a card </button>
 		<div class="main-area">
+			<div id="card">
+			</div>
 		</div>
 	</div>
 

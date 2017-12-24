@@ -73,33 +73,71 @@ io.on("connection", function(socket){
       // Add the user to the channel"s list of players
       // client.lpush(channelID + "players", data.payload.username)
 
+      var deck = ["Ac", "Ad", "Ah", "As", 
+                          "2c", "2d", "2h", "2s",
+                          "3c", "3d", "3h", "3s",
+                          "4c", "4d", "4h", "4s",
+                          "5c", "5d", "5h", "5s",
+                          "6c", "6d", "6h", "6s",
+                          "7c", "7d", "7h", "7s",
+                          "8c", "8d", "8h", "8s",
+                          "9c", "9d", "9h", "9s",
+                          "10c", "10d", "10h", "10s",
+                          "Jc", "Jd", "Jh", "Js",
+                          "Qc", "Qd", "Qh", "Qs", 
+                          "Kc", "Kd", "Kh", "Ks"]
+      shuffleArray(deck)
+      const channelOfCards = channelID + "cards"
+      client.lpush(channelOfCards, deck)
+
       console.log("[INFO]: Channel '" + channelID + "' was created by user '" + data.payload.username + "'")
 
     } else if (method == 'join_channel') {
+      const listOfPlayers = data.payload.channelID
       const queueOfPlayers = data.payload.channelID + "players"
-      socket.join(data.payload.channelID)
-      client.lpush(queueOfPlayers, data.payload.username)
 
-      // get all connected players
-      client.lrange(queueOfPlayers, 0, -1, function (err, listOfPlayers) {
-        console.log(listOfPlayers)
-        io.to(data.payload.channelID).emit('messages', '{"method" : "new_player", "payload" : {"username" : ' + JSON.stringify(listOfPlayers) + '}}');
-        console.log('[INFO]: '+ data.payload.username + ' joined the channel ' + data.payload.channelID)
+      socket.join(data.payload.channelID)
+      client.sismember(listOfPlayers, data.payload.username, function(err, ismember) {
+        if (ismember == 0) {
+          client.lpush(queueOfPlayers, data.payload.username)
+          client.sadd(listOfPlayers, data.payload.username)
+        }
+
+        // get all connected players
+        client.lrange(queueOfPlayers, 0, -1, function (err, listOfPlayers) {
+          console.log(listOfPlayers)
+          io.to(data.payload.channelID).emit('messages', '{"method" : "new_player", "payload" : {"username" : ' + JSON.stringify(listOfPlayers) + '}}');
+          console.log('[INFO]: '+ data.payload.username + ' joined the channel ' + data.payload.channelID)
+        })
       })
       
+
+          
 
     } else if (method == 'start') {
       const channel = data.payload.channelID
       io.to(data.payload.channelID).emit('messages', '{"method" : "start", "payload" : {}}');
       console.log('[INFO]: The game in room '+ data.payload.channelID + 'is starting')
 
+
+    } else if (method == 'game_play') {
+      const queueOfPlayers = data.payload.channelID + "players"
+      socket.join(data.payload.channelID)
+      client.lrange(queueOfPlayers, 0, -1, function (err, listOfPlayers) {
+          console.log(listOfPlayers)
+          client.lrange(queueOfPlayers, -1, -1, function (err, player) {
+            io.to(data.payload.channelID).emit('messages', '{"method" : "game_play", "payload" : {"number_players" : ' + listOfPlayers.length + ', "next_player" : "'+ player +'"}}');
+          })
+        })
+
     } else if (method == 'card_play') {
       const queueOfCards = data.payload.channelID + "cards"
       const queueOfPlayers = data.payload.channelID + "players"
       client.lpop(queueOfCards, function (err, card) {
         client.lpop(queueOfPlayers, function (err, player) {
+          console.log('CARD AT PLAY ' + player)
           const message = {
-                            "method" : "next_player",
+                            "method" : "card_play",
                             "payload" : 
                                       {
                                         "card" : card,
@@ -107,7 +145,7 @@ io.on("connection", function(socket){
                                       }
                           }
           io.to(data.payload.channelID).emit('messages', JSON.stringify(message))
-          client.lpush(queueOfPlayers, player)
+          client.rpush(queueOfPlayers, player)
         })
       })
     }
@@ -123,6 +161,15 @@ io.on("connection", function(socket){
   });
 
 });
+
+
+// HELPER FUNCTIONS
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
 
 
 

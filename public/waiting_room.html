@@ -11,26 +11,26 @@
     var url_string = window.location.href;
     var url = new URL(url_string);
     var username = url.searchParams.get("username");
-    var code = url.searchParams.get("room");
+    var channelID = url.searchParams.get("room"); 
 
     // Create channel server side
     var socket = io();
-    socket.emit('joinChannel', { channelID : code , userID : username});
 
-    // Get the random 6 characters back from server and display
-    var channelID;
-    socket.on('passChannelID', function(data) {
-      channelID = data.id;
-      document.getElementById("roomCode").innerHTML = channelID;
+    // send signal upon joining
+    socket.emit('mailman', '{"method" : "join_channel", "payload" : {"username" : "' + username + '", "channelID" : "'+channelID+'"}}')
+
+    // listen to messages in the channel
+    socket.on("messages", function (data) {
+      var data = JSON.parse(data)
+      console.log(data)
+      if (data.method == 'start') {
+        console.log('STARTING THE GAME!!!')
+        window.location = /game/+channelID+'?username='+username
+      } else if (data.method == 'new_player') {
+        document.getElementById('newplayers').innerHTML = data.payload.username + '<br>'
+      }
     })
 
-    var numPlayers = 1;
-
-
-    // Update number of players in room on a
-    // socket.on(channelID, function(data)) {
-      
-    // }
   </script>
 
   <body>
@@ -38,7 +38,7 @@
       Joined <h1 id="roomHostId"></h1>'s room!
 
       There are currently <h1 id="numPeople"> X </h1> players in the room right now! 
-
+      <div id="newplayers"> </div>
       Waiting for 5 to start the game.
     </h1>
 

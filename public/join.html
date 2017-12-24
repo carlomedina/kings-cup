@@ -2,29 +2,39 @@
 <html>
   <head>
     <title>Joined Room</title>
-  </head>
-  <script src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
+  
   <script src="/socket.io/socket.io.js"></script>
   <script>
-    $(document).on("click", ".btn", function() {
-      var url_string = window.location.href;
-      var url = new URL(url_string);
-      var username = url.searchParams.get("username");
-      var code = document.getElementById("roomCode").value;
+  function join() {
+    var url_string = window.location.href;
+    var url = new URL(url_string);
+    var username = url.searchParams.get("username");
+    var code = document.getElementById("roomCode").value;
+    var xhr = new XMLHttpRequest();
 
-      var socket = io();
-      socket.emit("checkChannel", code);
-      socket.on("validChannel", function(valid) {
-        if (code && valid) { window.location = "/waiting_room?username=" + username + "&room=" + code }
-      })
-    })
+    xhr.onreadystatechange = function() {
+      console.log('sending');
+      if (this.readyState == 4 && this.status == 200) {
+        if (this.responseText == 'true') {
+          console.log('received response');
+          window.location = '/waiting_room?username=' + username + '&room=' + code;
+        } else {
+          console.log('error');
+        }
+      }
+    }
+    xhr.open("POST", "/check_code", true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.send(JSON.stringify({code: code}));
+  }
   </script>
-
+  
+  </head>
   <body>
-    <form id="join">
+    <!-- <form id="join-form"> -->
       <label for="roomCode">Enter the five digit room code</label>
       <input id="roomCode" type="text" maxlength="5" class="box" autofocus />
-      <input type="button" id="join" value="Join Room" class="btn" />
-    </form>
+      <input type="button" id="join" value="Join Room" class="btn" onclick="join();"/>
+    <!-- </form> -->
   </body>
 </html>

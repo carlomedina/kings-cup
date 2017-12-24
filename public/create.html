@@ -10,29 +10,34 @@
     // Parse URL for the user string
     var url_string = window.location.href;
     var url = new URL(url_string);
-    var userID = url.searchParams.get("username");
-
-    // Create channel server side
+    var username = url.searchParams.get("username");
+    var channelID = url.searchParams.get("channelID")
     var socket = io();
-    socket.emit('createChannel', userID);
+  
+    // join the created channel
+    socket.emit('mailman', '{"method" : "join_channel", "payload" : {"username" : "' + username + '", "channelID" : "'+channelID+'"}}')
 
-    // Get the random 6 characters back from server and display
-    var channelID;
-    var num = 1;
-
-    console.log(document.getElementById("roomCode"));
-    socket.on('passChannelID', function(data) {
-      channelID = data.id;
-      document.getElementById("roomCode").innerHTML = channelID;
-      document.getElementById("numPlayers").innerHTML = num;
+    socket.on('messages', function(data) {
+      console.log(data)
+      var data = JSON.parse(data)
+      if (data.method == 'new_player') {
+        document.getElementById('namePlayers').innerHTML = data.payload.username + '<br>'
+      }
     })
 
-    // Update the number of players when the channel join socket is hit
-    // TODO
-    socket.on("joinChannel" + channelID, function() {
-      console.log('someone joined!')
-      document.getElementById("numPlayers").innerHTML = ++num;
-    })
+  function start() {
+    // send message to the channel that the game is starting
+    socket.emit('mailman', '{"method": "start", "payload": {"channelID" : "'+channelID+'"}}')
+
+    // go to the main game page
+    window.location = /game/+channelID+'?username='+username
+  }
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('roomCode').innerHTML = channelID
+    }); 
+      
 
   </script>
 
@@ -42,6 +47,15 @@
       <h1 id="roomCode"></h1>
 
       There are currently <h1 id="numPlayers"></h1> players in the room right now! 
+
+      <div class="start-game">
+        <button id="start" value="Start Game" class="cbtn" onclick="start();">Start Game</button>
+        <br>
+
+        <div id="namePlayers">
+        </div>
+      
+      </div>
     </div>
   </body>
 </html>

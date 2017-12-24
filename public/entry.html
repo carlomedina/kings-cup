@@ -2,36 +2,57 @@
 <html>
   <head>
     <title>Entry</title>
+      <script src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
+      <script src="/socket.io/socket.io.js"></script>
+      <script>
+  function create() {
+
+    const username = document.getElementById("username").value;
+    var socket = io();
+    var channelID;
+
+    if (username && username.length > 0) {
+      socket.emit('mailman', '{"method" : "create_channel", "payload" : {"username" : "'+username+'"}}')
+
+      socket.on('messages', function(data) {
+        var data = JSON.parse(data)
+        if (data.method == 'initialize_channel') {
+          channelID = data.payload.channelID
+            if (username && username.length > 0) {
+              // console.log(channelID)
+              window.location = '/create?username=' + username + '&channelID=' + channelID
+            }
+        } 
+      })
+    }
+    
+  }
+
+  function join() {
+    var username = document.getElementById("username").value;
+        if (username && username.length > 0) {
+          window.location = '/join?username=' + username;
+        }
+    // document.getElementById("id").appendChild(element);
+  }
+  </script>
   </head>
 
-  <script src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
-  <script>
-    // Please excuse this very wet code
-    $(document).on('click', '.cbtn', function() {
-        var userName = document.getElementById("userName").value;
-        if (userName && userName.length > 0) {
-          window.location = '/create?username=' + userName;
-        }
-    })
-    $(document).on('click', '.jbtn', function() {
-        var userName = document.getElementById("userName").value;
-        if (userName && userName.length > 0) {
-          window.location = '/join?username=' + userName;
-        }
-    })
-  </script>
 
   <body>
+
+
     <h1>
-      Please login here!
+      King's Cup
     </h1>
-    <form id="createOrJoin">
-      <label for="userName">Enter your username: </label>
-      <input id="userName" type="text" maxlength="55" class="box" autofocus />
+    <!-- <form id="createOrJoin"> -->
+      <label for="username">Enter your username: </label>
+      <input id="username" type="text" maxlength="55" class="box" autofocus />
       <br>
-      <input type="button" id="create" value="Create Room" class="cbtn" />
-      <input type="button" id="join" value="Join Room" class="jbtn" />
-    </form>
+      <button id="create" class="cbtn" onclick="create();">Create Room</button>
+      <br>
+      <button id="join" class="jbtn" onclick="join();">Join Room</button>
+    <!-- </form> -->
   </body>
 </html>
 

@@ -12,7 +12,7 @@
 
 	function join() {
 		// var form = '<form action="/join">Channel id: <br> <input type="text" name="channelID"> </input> </form>';
-		document.getElementById("join-game").innerHTML += '<form class="join-form" action="/join">Channel id: <br> <input type="text" name="channelID"> </input> </form>';
+		document.getElementById("join-game").innerHTML += '<div class="pop-up"><form class="join-form" action="/join">Channel id: <br> <input type="text" name="channelID"> </input> </form></div>';
 		// document.getElementById("id").appendChild(element);
 
 	}
@@ -38,7 +38,6 @@
 		left: 50%;
 		transform: translateX(-50%);
 	}
-
 	.wrapper {
 		max-width: 500px;
 		width: 80%;
@@ -48,6 +47,19 @@
 		top: 50%;
 		transform: translateX(-50%) translateY(-50%);
 		background-color: green;
+	}
+
+	.pop-up {
+		position: absolute;
+		left: 50%;
+		top:50%;
+		transform: translateX(-50%) translateY(-50%);
+		width: 60%;
+		background-color: white;
+	}
+
+	.join-form{
+		
 	}
 	</style>
 </head>
@@ -61,11 +73,18 @@
 	</div>
 
 	<div class="game-mode">
+
+		<form id="username-form">
+			<label for="username">Enter your username: </label>
+      		<input id="username" type="text" maxlength="55" class="box" autofocus />
+      	</form>
+
 		<div id="create-game">
-		<button class="init-buttons" onclick="create();"> Create Game </button>
+			<button class="init-buttons" onclick="create();"> Create Game </button>
 		</div>
+
 		<div id="join-game">
-		<button class="init-buttons" onclick="join();"> Join Game </button>
+			<button class="init-buttons" onclick="join();"> Join Game </button>
 		</div>
 	</div>
 </div>

@@ -47,7 +47,7 @@ app.post("/card_image", function(req, res) {
 })
 
 
-io.on("connection", function(socket){
+io.on("connection", function(socket) {
 
   socket.on("connect", function() {
     console.log("A client connected");
@@ -135,7 +135,6 @@ io.on("connection", function(socket){
       const queueOfPlayers = data.payload.channelID + "players"
       client.lpop(queueOfCards, function (err, card) {
         client.lpop(queueOfPlayers, function (err, player) {
-          console.log('CARD AT PLAY ' + player)
           const message = {
                             "method" : "card_play",
                             "payload" : 

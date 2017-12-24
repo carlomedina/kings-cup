@@ -2,39 +2,39 @@
 <html>
   <head>
     <title>Entry</title>
-      <script src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
-      <script src="/socket.io/socket.io.js"></script>
-      <script>
-  function create() {
+  <script src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    function create() {
 
-    const username = document.getElementById("username").value;
-    var socket = io();
-    var channelID;
+      const username = document.getElementById("username").value;
+      var socket = io();
+      var channelID;
 
-    if (username && username.length > 0) {
-      socket.emit('mailman', '{"method" : "create_channel", "payload" : {"username" : "'+username+'"}}')
+      if (username && username.length > 0) {
+        socket.emit('mailman', '{"method" : "create_channel", "payload" : {"username" : "'+username+'"}}')
 
-      socket.on('messages', function(data) {
-        var data = JSON.parse(data)
-        if (data.method == 'initialize_channel') {
-          channelID = data.payload.channelID
-            if (username && username.length > 0) {
-              // console.log(channelID)
-              window.location = '/create?username=' + username + '&channelID=' + channelID
-            }
-        } 
-      })
+        socket.on('messages', function(data) {
+          var data = JSON.parse(data)
+          if (data.method == 'initialize_channel') {
+            channelID = data.payload.channelID
+              if (username && username.length > 0) {
+                // console.log(channelID)
+                window.location = '/create?username=' + username + '&channelID=' + channelID
+              }
+          } 
+        })
+      }
+      
     }
-    
-  }
 
-  function join() {
-    var username = document.getElementById("username").value;
-        if (username && username.length > 0) {
-          window.location = '/join?username=' + username;
-        }
-    // document.getElementById("id").appendChild(element);
-  }
+    function join() {
+      var username = document.getElementById("username").value;
+          if (username && username.length > 0) {
+            window.location = '/join?username=' + username;
+          }
+      // document.getElementById("id").appendChild(element);
+    }
   </script>
   </head>
 

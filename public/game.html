@@ -24,23 +24,19 @@ socket.on('messages', function(data) {
   if (method == 'game_play') {
   	document.getElementById('player-count').innerHTML = data.payload.number_players
   	document.getElementById('current-player').innerHTML = data.payload.next_player
-  	// disable get card if not turn yet
-  	if (data.payload.next_player != username) {
-  		document.getElementById('card-button').disabled = true
-  	} else {
-  		document.getElementById('card-button').disabled = false
-  	}
+    document.getElementById('card-button').disabled = (data.payload.next_player != username)
   } 
   	// during gameplay
   else if (method == 'card_play') {
+    var card_pict = document.createElement("img")
+    path = "/cards/PNG/" + data.payload.card + ".png"
+    card_pict.setAttribute("src", path)
+    card_pict.setAttribute("height","500")
+    card_pict.setAttribute("width", "300")
   	document.getElementById('current-player').innerHTML = data.payload.next_player
-  	document.getElementById('card').innerHTML = data.payload.card
-  	// disable get card if not turn yet
-  	if (data.payload.next_player != username) {
-  		document.getElementById('card-button').disabled = true
-  	} else {
-  		document.getElementById('card-button').disabled = false
-  	}
+    document.getElementById('card').innerHTML = ""
+    document.getElementById('card').appendChild(card_pict)
+    document.getElementById('card-button').disabled = (data.payload.next_player != username)
   }
 
 })

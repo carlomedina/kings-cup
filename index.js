@@ -133,6 +133,7 @@ io.on("connection", function(socket) {
     } else if (method == 'card_play') {
       const queueOfCards = data.payload.channelID + "cards"
       const queueOfPlayers = data.payload.channelID + "players"
+      const numKings = data.payload.channelID + "kings"
       client.lpop(queueOfCards, function (err, card) {
         client.lpop(queueOfPlayers, function (err, player) {
           const message = {

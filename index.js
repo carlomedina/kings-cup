@@ -88,7 +88,6 @@ io.on("connection", function(socket) {
                           "Kc", "Kd", "Kh", "Ks"]
 
       shuffleArray(deck)
-      // const channelOfCards = channelID + "cards"
       client.lpush(channelID + "cards", deck)
       client.set(channelID + "kings", 4)
 
@@ -112,10 +111,7 @@ io.on("connection", function(socket) {
           console.log('[INFO]: '+ data.payload.username + ' joined the channel ' + data.payload.channelID)
         })
       })
-      
-
-          
-
+    
     } else if (method == 'start') {
       const channel = data.payload.channelID
       io.to(data.payload.channelID).emit('messages', '{"method" : "start", "payload" : {}}');
@@ -146,13 +142,15 @@ io.on("connection", function(socket) {
             }
 
             var method = end ? "game_end" : "card_play"
+            var name = end ? data.payload.username : player
+
             const message = {
               "method" : method,
               "payload" : 
-                        {
-                          "card" : card,
-                          "next_player" : player
-                        }
+                {
+                  "card" : card,
+                  "next_player" : name
+                }
             }
             io.to(data.payload.channelID).emit('messages', JSON.stringify(message))
             client.rpush(queueOfPlayers, player)
@@ -161,11 +159,6 @@ io.on("connection", function(socket) {
       })
     }
   })
-
-
-
-
-
 
   socket.on("disconnect", function () {
     console.log("A client disconnected");
@@ -182,124 +175,11 @@ function shuffleArray(array) {
     }
 }
 
-function noKings(channel) {
-  const kingsChannel = channel + "kings"
-  var n = false
-  client.decr(kingsChannel, function(err, num) {
-    console.log(num)
-    n = (num > 0)
-  })
-  return n
-}
-
-
 
 http.listen(3000, function(){
   console.log("listening on *:3000");
 });
 
-
-
-
-
-
-
-
-
-// SANDBOX
-
-
-  // // Check if a channel is available to be joined
-  // socket.on("checkChannel", function(channelID) {
-
-  //   // Grab all channels and check
-  //   client.smembers("activeChannels", function(err, reply) {
-
-  //     // Send results
-  //     socket.emit("validChannel", (reply.indexOf(channelID) != -1));
-  //   });
-  // })
-
-  // // end-point for other players to join a channel
-  // // params
-  // // data - JSON {userID, channelID
-  // socket.on("joinChannel", function(data) {
-  //   console.log(data.userID + " joined channel " + data.channelID)
-
-  //   // join to the game's room
-  //   socket.join(data.channelID)
-
-  //   // Add to list of players
-  //   client.lpush(data.channelID + "players", data.userID)
-
-  //   // Tell the host that you joined so it increments
-  //   // TODO: Use redis incr and decr for player number instead of length
-  //   // socket.emit("joinChannel" + data.channelID)
-
-  //   // Broadcast to all connected players in the room
-  //   io.to(data.channelID).emit(data.channelID, '{"method": "new_player", "payload": "'+data.userID+'"}')
-  // })
-
-
-  // // when any player does a card uncover, do Redis pop to select a card to play
-  // // publish the selected card to everyone on the channel
-
-  // // params
-  // // data - JSON {channelID, userID}
-  // socket.on("cardPlay", function(data) {
-
-  //   // do a redis pop to get a card
-  //   const channelOfCards = data.channelID + "cards"
-  //   client.lpop(channelOfCards, function(err, card) {
-      
-  //     // and get the next player 
-  //     client.lpop(data.channelID, function(err, player) {
-
-  //     // send the card and the next player to play
-  //     var payload = {
-  //                    "card": card,
-  //                    "nextplayer": player
-  //                   }
-
-  //     // broadcast what card was played and who is to play next
-  //     socket.emit(data.channelID, JSON.stringify(payload))
-
-  //     // add the pushed player back to the end of the queue
-  //     client.lpush(data.channelID, player)
-  //     })
-      
-  //   })
-
-  // })
-
-
-  //   // Create a channel for a given session
-  // socket.on("createChannel", function(userID) {
-
-  //   // Create a random 6-character string
-  //   const channelID = Math.random().toString(36).substr(2, 5)
-
-  //   // Pass the string to client
-  //   socket.emit("passChannelID", { id : channelID });
-
-  //   // Create a channel using the 6-character string
-  //   socket.join(channelID)
-
-  //   // Add the channelID to the list of all active channelID
-  //   client.sadd("activeChannels", channelID)
-  //   // Add the user to the channel"s list of players
-  //   client.lpush(channelID + "players", userID)
-
-  //   console.log("Channel '" + channelID + "' was created by user '" + userID + "'")
-
-  //   // TODO: in more detail
-  //   // initialize the deck of cards by randomly permuting a set and storing it
-  //   // in a named Redis queue (also named the same way as the socket channel)
-  //   // const shuffledDeck = ["Ac", "Ad", "Ah", "As"]
-
-  //   // var channelOfCards = channelID + "cards"
-  //   // client.lpush(channelOfCards, shuffledDeck)
-  // })
 
 
 

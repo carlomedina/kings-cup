@@ -13,7 +13,7 @@ var url = new URL(url_string);
 var username = url.searchParams.get("username");
 var socket = io();
 
-socket.emit('mailman', '{"method" : "game_play", "payload" : {"channelID" : "'+channelID+'"}}')
+socket.emit('mailman', '{"method" : "game_play", "payload" : { "channelID" : "'+channelID+'" }}')
 
 socket.on('messages', function(data) {
 	var data = JSON.parse(data)
@@ -26,13 +26,15 @@ socket.on('messages', function(data) {
   	document.getElementById('current-player').innerHTML = data.payload.next_player + " to play" 
     document.getElementById('card-button').disabled = (data.payload.next_player != username)
   } 
-  	// during gameplay
+  
+  // during gameplay
   else if (method == 'card_play') {
     showImage(data.payload.card)
   	document.getElementById('current-player').innerHTML = data.payload.next_player + " to play"
     document.getElementById('card-button').disabled = (data.payload.next_player != username)
   }
 
+  // last king has been drawn
   else if (method == 'game_end') {
     showImage(data.payload.card)
     // replace with a more suitable ending
@@ -44,7 +46,9 @@ socket.on('messages', function(data) {
 
 // send signal that the player just played a card
 function sendCardPlay() {
-	socket.emit('mailman', '{"method" : "card_play", "payload" : {"channelID" : "' + channelID + '"}}')
+	socket.emit('mailman', 
+    '{"method" : "card_play", "payload" : {"channelID" : "' + channelID + '", "username" : "' + username + '" }}'
+  )
 }
 
 // show picture of card drawn

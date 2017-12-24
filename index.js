@@ -40,9 +40,9 @@ app.post("/check_code", function(req, res){
 })
 
 // POST REQUQEST TO GET CARD IMAGE
-app.post("/card_image", function(req, res) {
+app.get("/card_image/:card", function(req, res) {
   console.log(req)
-  var cardname = req.body.card + ".png"
+  var cardname = req.param("card") + ".png"
   res.sendFile(__dirname + "/public/cards/PNG/" + cardname)
 })
 
@@ -73,19 +73,20 @@ io.on("connection", function(socket) {
       // Add the user to the channel"s list of players
       // client.lpush(channelID + "players", data.payload.username)
 
-      var deck = ["Ac", "Ad", "Ah", "As", 
-                          "2c", "2d", "2h", "2s",
-                          "3c", "3d", "3h", "3s",
-                          "4c", "4d", "4h", "4s",
-                          "5c", "5d", "5h", "5s",
-                          "6c", "6d", "6h", "6s",
-                          "7c", "7d", "7h", "7s",
-                          "8c", "8d", "8h", "8s",
-                          "9c", "9d", "9h", "9s",
-                          "10c", "10d", "10h", "10s",
-                          "Jc", "Jd", "Jh", "Js",
-                          "Qc", "Qd", "Qh", "Qs", 
-                          "Kc", "Kd", "Kh", "Ks"]
+      var deck = ["AC", "AD", "AH", "AS", 
+                  "2C", "2D", "2H", "2S",
+                  "3C", "3D", "3H", "3S",
+                  "4C", "4D", "4H", "4S",
+                  "5C", "5D", "5H", "5S",
+                  "6C", "6D", "6H", "6S",
+                  "7C", "7D", "7H", "7S",
+                  "8C", "8D", "8H", "8S",
+                  "9C", "9D", "9H", "9S",
+                  "10C", "10D", "10H", "10S",
+                  "JC", "JD", "JH", "JS",
+                  "QC", "QD", "QH", "QS", 
+                  "KC", "KD", "KH", "KS"]
+
       shuffleArray(deck)
       const channelOfCards = channelID + "cards"
       client.lpush(channelOfCards, deck)

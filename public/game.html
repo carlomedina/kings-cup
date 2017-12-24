@@ -34,7 +34,8 @@ socket.on('messages', function(data) {
   	// during gameplay
   else if (method == 'card_play') {
   	document.getElementById('current-player').innerHTML = data.payload.next_player
-  	document.getElementById('card').innerHTML = data.payload.card
+  	document.getElementById('card-div').innerHTML = data.payload.card
+  	getCardImage(data.payload.card)
   	// disable get card if not turn yet
   	if (data.payload.next_player != username) {
   		document.getElementById('card-button').disabled = true
@@ -49,6 +50,25 @@ socket.on('messages', function(data) {
 function sendCardPlay() {
 	socket.emit('mailman', '{"method" : "card_play", "payload" : {"channelID" : "' + channelID + '"}}')
 }
+
+function getCardImage(card) {
+	// var xhr = new XMLHttpRequest();
+
+	document.getElementById('card-content').src='/card_image/'+card
+
+    // xhr.onreadystatechange = function() {
+    //   console.log('getting card image');
+    //   if (this.readyState == 4 && this.status == 200) {
+    //     document.getElementById('card').setAttribute('src', "data:image/png;base64," + this.response)
+    //     console.log(this.response)
+    //     document.getElementById('card-div').innerHTML(this.responseText)
+    //   }
+    // }
+    // xhr.open("GET", "/card_image/" + card, true);
+    // xhr.setRequestHeader("Content-Type", "application/json");
+    // xhr.send(JSON.stringify({card: card}));
+  }
+
 
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('roomCode').innerHTML = channelID
@@ -71,10 +91,11 @@ document.addEventListener('DOMContentLoaded', function() {
 	<div class="play-area">
 		<button id="card-button" onclick='sendCardPlay();'> Play a card </button>
 		<div class="main-area">
-			<div id="card">
+			<div id="card-div">
 			</div>
+			<img id="card-content" src='/card_image/gray_back' />
 		</div>
 	</div>
-
+</div>
 </body>
 </html>

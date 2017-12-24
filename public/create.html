@@ -12,35 +12,7 @@
     var url = new URL(url_string);
     var username = url.searchParams.get("username");
     var socket = io();
-    // // Create channel server side
-    
-    // socket.emit('createChannel', userID);
-
-    // // Get the random 6 characters back from server and display
-    // var channelID;
-    // var num = 1;
-
-    // socket.on('passChannelID', function(data) {
-    //   channelID = data.id;
-    //   console.log(channelID)
-    //   document.getElementById("roomCode").innerHTML = channelID;
-    //   document.getElementById("numPlayers").innerHTML = num;
-    // })
-
-    // // Update the number of players when the channel join socket is hit
-    // // TODO
-    // socket.on("joinChannel" + channelID, function() {
-    //   console.log('someone joined!')
-    //   document.getElementById("numPlayers").innerHTML = ++num;
-    // })
-
-    // socket.on(channelID, function(data) {
-    //   console.log(data)
-    //   if (data.method == 'new_player') {
-    //     document.getElementById('listPlayers').innerHTML += data.payload
-    //   }
-      
-    // })
+  
 
     var channelID;
     socket.emit('mailman', '{"method" : "create_channel", "payload" : {"username" : "'+username+'"}}')
@@ -51,6 +23,7 @@
         channelID = data.payload.channelID
         document.getElementById('roomCode').innerHTML = channelID
       } else if (data.method == 'new_player') {
+        document.getElementById('namePlayers').innerHTML += data.payload.username + '<br>'
         console.log('NEW PLAYER ' + data.payload + ' JOINED')
       }
     })
@@ -62,6 +35,7 @@
     // go to the main game page
     window.location = /game/+channelID+'?username='+username
   }
+
   </script>
 
   <body>
@@ -73,9 +47,11 @@
 
       <div class="start-game">
         <button id="start" value="Start Game" class="cbtn" onclick="start();"/> 
-      <br>
-      <div id="numPlayers">
-      </div>
+        <br>
+        
+        <div id="namePlayers">
+        </div>
+      
       </div>
     </div>
   </body>

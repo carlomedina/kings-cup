@@ -16,28 +16,10 @@
     // Create channel server side
     var socket = io();
 
-    // // send a join message to the overall channel
-    // socket.emit('joinChannel', { channelID : code , userID : username});
-
-
-    // // this is the workhorse of the gameplay
-    // // params: data {method, payload}
-    // socket.on(code, function(data) {
-    //   // when the room owner initiates 'start'
-    //   // do a get request to get the card.html pages
-    // console.log("Got HIT" + data);
-    // if (data.method == 'start') {
-    
-    //   window.location = /game/+code+'?username='+userID
-    
-    // } else if (data.method == 'new_player') {
-    //   // update the new player div element
-    // }
-
-    // })
-
+    // send signal upon joining
     socket.emit('mailman', '{"method" : "join_channel", "payload" : {"username" : "' + username + '", "channelID" : "'+channelID+'"}}')
 
+    // listen to messages in the channel
     socket.on("messages", function (data) {
       var data = JSON.parse(data)
       console.log(data)
@@ -45,16 +27,10 @@
         console.log('STARTING THE GAME!!!')
         window.location = /game/+channelID+'?username='+username
       } else if (data.method == 'new_player') {
-        document.getElementById('newplayers').innerHTML += data.payload.username
+        document.getElementById('newplayers').innerHTML += data.payload.username + '<br>'
       }
     })
 
-
-
-    // Update number of players in room on a
-    // socket.on(channelID, function(data)) {
-      
-    // }
   </script>
 
   <body>

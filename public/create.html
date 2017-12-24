@@ -10,36 +10,57 @@
     // Parse URL for the user string
     var url_string = window.location.href;
     var url = new URL(url_string);
-    var userID = url.searchParams.get("username");
-
-    // Create channel server side
+    var username = url.searchParams.get("username");
     var socket = io();
-    socket.emit('createChannel', userID);
+    // // Create channel server side
+    
+    // socket.emit('createChannel', userID);
 
-    // Get the random 6 characters back from server and display
+    // // Get the random 6 characters back from server and display
+    // var channelID;
+    // var num = 1;
+
+    // socket.on('passChannelID', function(data) {
+    //   channelID = data.id;
+    //   console.log(channelID)
+    //   document.getElementById("roomCode").innerHTML = channelID;
+    //   document.getElementById("numPlayers").innerHTML = num;
+    // })
+
+    // // Update the number of players when the channel join socket is hit
+    // // TODO
+    // socket.on("joinChannel" + channelID, function() {
+    //   console.log('someone joined!')
+    //   document.getElementById("numPlayers").innerHTML = ++num;
+    // })
+
+    // socket.on(channelID, function(data) {
+    //   console.log(data)
+    //   if (data.method == 'new_player') {
+    //     document.getElementById('listPlayers').innerHTML += data.payload
+    //   }
+      
+    // })
+
     var channelID;
-    var num = 1;
+    socket.emit('mailman', '{"method" : "create_channel", "payload" : {"username" : "'+username+'"}}')
 
-    console.log(document.getElementById("roomCode"));
-    socket.on('passChannelID', function(data) {
-      channelID = data.id;
-      document.getElementById("roomCode").innerHTML = channelID;
-      document.getElementById("numPlayers").innerHTML = num;
-    })
-
-    // Update the number of players when the channel join socket is hit
-    // TODO
-    socket.on("joinChannel" + channelID, function() {
-      console.log('someone joined!')
-      document.getElementById("numPlayers").innerHTML = ++num;
+    socket.on('messages', function(data) {
+      var data = JSON.parse(data)
+      if (data.method == 'initialize_channel') {
+        channelID = data.payload.channelID
+        document.getElementById('roomCode').innerHTML = channelID
+      } else if (data.method == 'new_player') {
+        console.log('NEW PLAYER ' + data.payload + ' JOINED')
+      }
     })
 
   function start() {
     // send message to the channel that the game is starting
-    socket.emit(channelID, '{"method": "start", "payload": ""}')
+    socket.emit('mailman', '{"method": "start", "payload": {"channelID" : "'+channelID+'"}}')
 
     // go to the main game page
-    window.location = /game/+channelID+'?username='+userID
+    window.location = /game/+channelID+'?username='+username
   }
   </script>
 
@@ -51,8 +72,10 @@
       There are currently <h1 id="numPlayers"></h1> players in the room right now! 
 
       <div class="start-game">
-        <input type="button" id="start" value="Start Game" class="cbtn" onclick="start();"/> 
+        <button id="start" value="Start Game" class="cbtn" onclick="start();"/> 
       <br>
+      <div id="numPlayers">
+      </div>
       </div>
     </div>
   </body>

@@ -2,65 +2,72 @@
 <html>
   <head>
     <title>Entry</title>
-  </head>
+      <script src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
 
-  <script src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
-  <script>
-    // Please excuse this very wet code
-    $(document).on('click', '.cbtn', function() {
-        var userName = document.getElementById("userName").value;
-        if (userName && userName.length > 0) {
-          window.location = '/create?username=' + userName;
-        }
-    })
-    $(document).on('click', '.jbtn', function() {
-        var userName = document.getElementById("userName").value;
-        if (userName && userName.length > 0) {
-          window.location = '/join?username=' + userName;
-        }
-    })
+      <script>
+    // // Please excuse this very wet code
+    // $(document).on('click', '.cbtn', function() {
+    //     var userName = document.getElementById("userName").value;
+    //     if (userName && userName.length > 0) {
+    //       window.location = '/create?username=' + userName;
+    //     }
+    // })
+    // $(document).on('click', '.jbtn', function() {
+    //     var userName = document.getElementById("userName").value;
+    //     if (userName && userName.length > 0) {
+    //       window.location = '/join?username=' + userName;
+    //     }
+    // })
 
   function create() {
     var userName = document.getElementById("userName").value;
-   
+   console.log(userName)
     if (userName && userName.length > 0) {
-    window.location = '/create?username=' + userName
+      window.location = '/create?username=' + userName
 
-      // VERSION 2: using async
-    //   const payload = "username="+userName
-    //   const xhr = new XMLHttpRequest();
+        // VERSION 2: using async
+      //   const payload = "username="+userName
+      //   const xhr = new XMLHttpRequest();
 
-    //   xhr.onreadystatechange = function() {
-    //     if (this.readyState == 4 && this.status == 200) {
-    //       window.location = 
-    //     }
-    //   }
+      //   xhr.onreadystatechange = function() {
+      //     if (this.readyState == 4 && this.status == 200) {
+      //       window.location = 
+      //     }
+      //   }
 
-    //   xhr.open("GET", "/create")
-    //   xhr.send("username="+username);
-    // }
+      //   xhr.open("GET", "/create")
+      //   xhr.send("username="+username);
+      // }
+    }
   }
 
   function join() {
     // var form = '<form action="/join">Channel id: <br> <input type="text" name="channelID"> </input> </form>';
-    document.getElementById("join").innerHTML += '<form class="join-form" action="/join">Channel id: <br> <input type="text" name="channelID"> </input> </form>';
+    // document.getElementById("join").innerHTML += '<form class="join-form" action="/join">Channel id: <br> <input type="text" name="channelID"> </input> </form>';
+    var userName = document.getElementById("userName").value;
+        if (userName && userName.length > 0) {
+          window.location = '/join?username=' + userName;
+        }
     // document.getElementById("id").appendChild(element);
-
   }
   </script>
+  </head>
+
 
   <body>
+
+
     <h1>
       King's Cup
     </h1>
-    <form id="createOrJoin">
+    <!-- <form id="createOrJoin"> -->
       <label for="userName">Enter your username: </label>
       <input id="userName" type="text" maxlength="55" class="box" autofocus />
       <br>
-      <input type="button" id="create" value="Create Room" class="cbtn" onclick="create();"/> 
+      <button id="create" class="cbtn" onclick="create();">Create Room</button>
       <br>
-      <input type="button" id="join" value="Join Room" class="jbtn" onclick="join();"/>
-    </form>
+      <button id="join" class="jbtn" onclick="join();">Join Room</button>
+    <!-- </form> -->
   </body>
 </html>
 

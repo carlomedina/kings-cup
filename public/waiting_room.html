@@ -23,8 +23,8 @@
     socket.on("messages", function (data) {
       var data = JSON.parse(data)
       console.log(data)
+      
       if (data.method == 'start') {
-        console.log('STARTING THE GAME!!!')
         window.location = /game/+channelID+'?username='+username
       } else if (data.method == 'new_player') {
         document.getElementById('newplayers').innerHTML = data.payload.username + '<br>'

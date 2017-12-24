@@ -13,13 +13,10 @@ var url = new URL(url_string);
 var username = url.searchParams.get("username");
 var socket = io();
 
-// connect to the game channel
-// game channel XXXXXXX needs to be replaced with the actual channelID before the server sends the page to client
 socket.emit('mailman', '{"method" : "game_play", "payload" : {"channelID" : "'+channelID+'"}}')
 
 socket.on('messages', function(data) {
 	var data = JSON.parse(data)
-	console.log(data)
 
 	var method = data.method
 
@@ -45,16 +42,11 @@ socket.on('messages', function(data) {
   		document.getElementById('card-button').disabled = false
   	}
   }
-  // update room status (number of players, xyz disconnected)
 
-  // card has been played 
-
-  // enable the player to play a card
 })
 
 // send signal that the player just played a card
 function sendCardPlay() {
-	console.log('card at play')
 	socket.emit('mailman', '{"method" : "card_play", "payload" : {"channelID" : "' + channelID + '"}}')
 }
 
